@@ -28,7 +28,12 @@ typedef struct mutex
 	int section;
 	bool locked;
 	void* sect_ptr;
+	mem_t space;
 } mutex_t;
+static int call_unlock = 0;
+static int call_allock = 0;
+
+static int call_lock = 0;
 
 
 /*
@@ -43,14 +48,17 @@ typedef struct mutex
 
 void MutexLock (mutex_t *m)
 {
+	call_lock++;
 }
 
 void MutexUnlock (mutex_t *m)
 {
+	call_unlock++;
 }
 
 mutex_t *MutexAlloc(void)
 {
+	call_allock++;
 	return NULL;
 }
 
@@ -74,6 +82,7 @@ IRIX
 
 void MutexLock (mutex_t *m)
 {
+	call_lock++;
 	abilock_t *lck;
 
 	if (!m)
@@ -84,6 +93,7 @@ void MutexLock (mutex_t *m)
 
 void MutexUnlock (mutex_t *m)
 {
+	call_unlock++;
 	abilock_t *lck;
 
 	if (!m)
@@ -94,6 +104,7 @@ void MutexUnlock (mutex_t *m)
 
 mutex_t *MutexAlloc(void)
 {
+	call_allock++;
 	abilock_t *lck;
 
 	if (numthreads == 1)
@@ -120,6 +131,7 @@ OSF1
 
 void MutexLock (mutex_t *m)
 {
+	call_lock++;
 	pthread_mutex_t	*my_mutex;
 
 	if (!m)
@@ -130,6 +142,7 @@ void MutexLock (mutex_t *m)
 
 void MutexUnlock (mutex_t *m)
 {
+	call_unlock++;
 	pthread_mutex_t	*my_mutex;
 
 	if (!m)
@@ -140,6 +153,7 @@ void MutexUnlock (mutex_t *m)
 
 mutex_t *MutexAlloc(void)
 {
+	call_allock++;
 	pthread_mutex_t	*my_mutex;
 	pthread_mutexattr_t	mattrib;
 
@@ -172,6 +186,7 @@ WIN32
 
 void MutexLock (mutex_t *m)
 {
+	call_lock++;
 	CRITICAL_SECTION *crit;
 
 	if (!m)
@@ -182,6 +197,7 @@ void MutexLock (mutex_t *m)
 
 void MutexUnlock (mutex_t *m)
 {
+	call_unlock++;
 	CRITICAL_SECTION *crit;
 
 	if (!m)
@@ -192,6 +208,7 @@ void MutexUnlock (mutex_t *m)
 
 mutex_t *MutexAlloc(void)
 {
+	call_allock++;
 	CRITICAL_SECTION *crit;
 
 	if (numthreads == 1)
